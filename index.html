@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Habits">
+<meta name="theme-color" content="#185fa5">
+<title>BuJo Habits</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+  :root {
+    --blue: #185fa5;
+    --blue-dark: #0c447c;
+    --green: #34c759;
+    --green-dark: #0a7a52;
+    --amber: #ff9500;
+    --red: #a32d2d;
+    --bg: #f2f2f7;
+    --card: #ffffff;
+    --border: #e5e5ea;
+    --text: #1c1c1e;
+    --text2: #6c6c70;
+    --text3: #aeaeb2;
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1c1c1e;
+      --card: #2c2c2e;
+      --border: #3a3a3c;
+      --text: #ffffff;
+      --text2: #aeaeb2;
+      --text3: #6c6c70;
+    }
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100%;
+    padding-top: calc(var(--safe-top) + 16px);
+    padding-bottom: calc(var(--safe-bottom) + 24px);
+    padding-left: 16px;
+    padding-right: 16px;
+    max-width: 430px;
+    margin: 0 auto;
+  }
+
+  /* Header */
+  .header {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  .header h1 {
+    font-size: 17px;
+    font-weight: 600;
+    letter-spacing: -0.3px;
+  }
+  .header p {
+    font-size: 13px;
+    color: var(--text3);
+    margin-top: 2px;
+  }
+
+  /* Tabs */
+  .tabs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 18px;
+    background: var(--card);
+    border-radius: 12px;
+    padding: 4px;
+    border: 1px solid var(--border);
+  }
+  .tab {
+    padding: 10px 8px;
+    border-radius: 9px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.18s;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  .tab.active {
+    background: var(--blue);
+  }
+  .tab-label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text2);
+  }
+  .tab.active .tab-label { color: #fff; }
+  .tab-date {
+    display: block;
+    font-size: 12px;
+    color: var(--text3);
+    margin-top: 1px;
+  }
+  .tab.active .tab-date { color: rgba(255,255,255,0.7); }
+
+  /* Habit list */
+  .habit-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  .habit-card {
+    display: flex;
+    align-items: center;
+    padding: 16px;
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 14px;
+    cursor: pointer;
+    -webkit-user-select: none;
+    user-select: none;
+    gap: 14px;
+    transition: border-color 0.15s, background 0.15s;
+    min-height: 64px;
+  }
+  .habit-card:active { transform: scale(0.98); }
+  .habit-card.done { background: #f0faf5; border-color: #a8dcc4; }
+  .habit-card.skip { background: #fff8eb; border-color: #ffd060; }
+  @media (prefers-color-scheme: dark) {
+    .habit-card.done { background: #0d3322; border-color: #1a6644; }
+    .habit-card.skip { background: #2d2000; border-color: #7a5000; }
+  }
+
+  .habit-info { flex: 1; min-width: 0; }
+  .habit-name {
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--text);
+  }
+  .habit-card.done .habit-name { color: #0a5c44; }
+  .habit-card.skip .habit-name { color: #7a4f00; }
+  @media (prefers-color-scheme: dark) {
+    .habit-card.done .habit-name { color: #4ade9a; }
+    .habit-card.skip .habit-name { color: #ffb340; }
+  }
+  .habit-sub {
+    font-size: 12px;
+    color: var(--text3);
+    margin-top: 2px;
+  }
+  .habit-card.done .habit-sub { color: #2a9b6a; }
+  .habit-card.skip .habit-sub { color: #c07800; }
+
+  .habit-badge {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    font-weight: 700;
+    flex-shrink: 0;
+    background: var(--border);
+    color: var(--text3);
+    transition: background 0.15s, color 0.15s;
+  }
+  .habit-card.done .habit-badge { background: var(--green); color: #fff; }
+  .habit-card.skip .habit-badge { background: var(--amber); color: #fff; }
+
+  /* Preview */
+  .preview {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 14px;
+    margin-bottom: 14px;
+  }
+  .preview-label {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 6px;
+  }
+  .preview-text {
+    font-family: 'SF Mono', 'Menlo', monospace;
+    font-size: 12px;
+    color: var(--text2);
+    line-height: 1.6;
+    word-break: break-all;
+  }
+
+  /* Buttons */
+  .btn-primary {
+    display: block;
+    width: 100%;
+    padding: 15px;
+    background: var(--blue);
+    color: #fff;
+    border: none;
+    border-radius: 14px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: -0.2px;
+    transition: background 0.15s, transform 0.1s;
+  }
+  .btn-primary:active { transform: scale(0.98); }
+  .btn-primary:disabled { background: var(--text3); cursor: not-allowed; }
+  .btn-primary.success { background: var(--green-dark); }
+  .btn-primary.error { background: var(--red); }
+
+  .btn-secondary {
+    display: block;
+    width: 100%;
+    padding: 13px;
+    background: transparent;
+    color: var(--blue);
+    border: 1.5px solid var(--border);
+    border-radius: 14px;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: background 0.15s, border-color 0.15s, transform 0.1s;
+  }
+  .btn-secondary:active { transform: scale(0.98); background: var(--bg); }
+
+  .status-msg {
+    text-align: center;
+    margin-top: 10px;
+    font-size: 13px;
+    min-height: 18px;
+    color: var(--text3);
+  }
+  .status-msg.ok { color: var(--green-dark); }
+  .status-msg.err { color: var(--red); }
+
+  /* Hint */
+  .hint {
+    text-align: center;
+    font-size: 12px;
+    color: var(--text3);
+    margin-bottom: 14px;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>BuJo Habits</h1>
+  <p>Tap to cycle · done · skip</p>
+</div>
+
+<div class="tabs">
+  <button class="tab active" id="tab-0" onclick="switchTab(0)">
+    <span class="tab-label">Yesterday</span>
+    <span class="tab-date" id="date-0"></span>
+  </button>
+  <button class="tab" id="tab-1" onclick="switchTab(1)">
+    <span class="tab-label">Today</span>
+    <span class="tab-date" id="date-1"></span>
+  </button>
+</div>
+
+<div id="habit-list" class="habit-list"></div>
+
+<div class="preview">
+  <div class="preview-label">Email preview</div>
+  <div class="preview-text" id="preview-text"></div>
+</div>
+
+<button class="btn-primary" id="send-btn" onclick="sendEmail()">✉ Email to BuJo</button>
+<p class="status-msg" id="status"></p>
+
+<script>
+const HABITS = [
+  { id: 'es',     name: 'Spanish (ES)', abbr: 'ES'     },
+  { id: 'chess',  name: 'Chess',        abbr: 'Chess'  },
+  { id: 'music',  name: 'Music',        abbr: 'Music'  },
+  { id: 'harp',   name: 'Harp',         abbr: 'Harp'   },
+  { id: 'school', name: 'School',       abbr: 'School' },
+  { id: 'move',   name: 'Move',         abbr: 'Move'   },
+];
+
+const STATES  = ['none', 'done', 'skip'];
+const SYMBOLS = { none: '·', done: '✓', skip: '–' };
+const BADGES  = { none: '○', done: '✓', skip: '−' };
+const LABELS  = { none: 'not done', done: 'done ✓', skip: 'skipped' };
+const DAYS    = ['Su','Mo','Tu','We','Th','Fr','Sa'];
+
+// State: two tabs × 6 habits
+const states = [
+  Object.fromEntries(HABITS.map(h => [h.id, 'none'])),
+  Object.fromEntries(HABITS.map(h => [h.id, 'none'])),
+];
+const emailed = [false, false];
+let tab = 0;
+
+function dateLabel(offset) {
+  const d = new Date();
+  d.setDate(d.getDate() + offset);
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+  return `${DAYS[d.getDay()]} ${mm}.${dd}`;
+}
+
+const dates = [dateLabel(-1), dateLabel(0)];
+document.getElementById('date-0').textContent = dates[0];
+document.getElementById('date-1').textContent = dates[1];
+
+function switchTab(idx) {
+  tab = idx;
+  document.getElementById('tab-0').classList.toggle('active', idx === 0);
+  document.getElementById('tab-1').classList.toggle('active', idx === 1);
+  render();
+  syncBtn();
+}
+
+function cycle(id) {
+  const cur = states[tab][id];
+  states[tab][id] = STATES[(STATES.indexOf(cur) + 1) % STATES.length];
+  render();
+  syncBtn();
+}
+
+function buildMessage() {
+  const parts = HABITS.map(h => `${h.abbr} ${SYMBOLS[states[tab][h.id]]}`).join(' ');
+  return `Bujo - habits for ${dates[tab]}: ${parts}`;
+}
+
+function render() {
+  const list = document.getElementById('habit-list');
+  list.innerHTML = '';
+  HABITS.forEach(h => {
+    const st = states[tab][h.id];
+    const card = document.createElement('div');
+    card.className = `habit-card ${st === 'none' ? '' : st}`.trim();
+    card.setAttribute('role', 'button');
+    card.setAttribute('tabindex', '0');
+    card.setAttribute('aria-label', `${h.name}: ${LABELS[st]}. Tap to change.`);
+    card.onclick = () => cycle(h.id);
+    card.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); cycle(h.id); } };
+    card.innerHTML = `
+      <div class="habit-info">
+        <div class="habit-name">${h.name}</div>
+        <div class="habit-sub">${LABELS[st]}</div>
+      </div>
+      <div class="habit-badge" aria-hidden="true">${BADGES[st]}</div>
+    `;
+    list.appendChild(card);
+  });
+  document.getElementById('preview-text').textContent = buildMessage();
+}
+
+function syncBtn() {
+  const btn = document.getElementById('send-btn');
+  const msg = document.getElementById('status');
+  if (emailed[tab]) {
+    btn.className = 'btn-primary success';
+    btn.textContent = 'Sent ✓ — Sweep picks it up tonight';
+    msg.className = 'status-msg ok';
+    msg.textContent = 'Check your Drafts if it didn\'t open Mail.';
+  } else {
+    btn.className = 'btn-primary';
+    btn.textContent = '✉ Email to BuJo';
+    btn.disabled = false;
+    msg.className = 'status-msg';
+    msg.textContent = '';
+  }
+}
+
+function sendEmail() {
+  const message = buildMessage();
+  const subject = encodeURIComponent(`Bujo - habits for ${dates[tab]}`);
+  const body    = encodeURIComponent(message);
+  window.location.href = `mailto:prusso@decisiv.com?subject=${subject}&body=${body}`;
+
+  // Mark as sent after short delay (mail app will have opened)
+  setTimeout(() => {
+    emailed[tab] = true;
+    syncBtn();
+  }, 800);
+}
+
+// Register service worker
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').catch(() => {});
+}
+
+render();
+syncBtn();
+</script>
+</body>
+</html>
