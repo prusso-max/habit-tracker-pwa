@@ -1,5 +1,11 @@
-const CACHE = 'bujo-habits-v1';
-const ASSETS = ['/', '/index.html', '/manifest.json', '/icon-192.png', '/icon-512.png'];
+const CACHE = 'bujo-habits-v2';
+const ASSETS = [
+  '/habit-tracker-pwa/',
+  '/habit-tracker-pwa/index.html',
+  '/habit-tracker-pwa/manifest.json',
+  '/habit-tracker-pwa/icon-192.png',
+  '/habit-tracker-pwa/icon-512.png'
+];
 
 self.addEventListener('install', e => {
   e.waitUntil(
