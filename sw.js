@@ -1,4 +1,4 @@
-const CACHE = 'bujo-habits-v2';
+const CACHE = 'bujo-habits-v3';
 const ASSETS = [
   '/habit-tracker-pwa/',
   '/habit-tracker-pwa/index.html',
